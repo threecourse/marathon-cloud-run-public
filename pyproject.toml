@@ -1,0 +1,46 @@
+[tool.poetry]
+name = "marathon-cloud-run-sample"
+version = "0.1.0"
+description = ""
+authors = ["threecourse"]
+
+[tool.poetry.dependencies]
+python = "3.7.*"
+numpy = "1.16.4"
+pandas = "0.24.2"
+optuna = "2.9.1"
+google-cloud-logging = "1.15.0"
+google-cloud-storage = "1.28.1"
+google-api-python-client = "2.2.0"
+SQLAlchemy = "1.4.22"  # work-around
+python-dotenv = "^0.19.0"
+
+[tool.poetry.dev-dependencies]
+ipython = "*"
+black = "*"
+mypy = "*"
+isort = "*"
+flake8 = "*"
+invoke = "*"
+pytest = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 119
+exclude = '''
+(
+    migrations
+    | .mypy_cache
+    | .pytest_cache
+    | .tox
+    | venv
+)
+'''
+
+[tool.isort]
+include_trailing_comma = true
+line_length = 99
+multi_line_output = 3

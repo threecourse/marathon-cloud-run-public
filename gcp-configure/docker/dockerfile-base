@@ -1,0 +1,87 @@
+FROM ubuntu:18.04
+# reference: https://hub.docker.com/r/nejumi/tools_for_kaggle/dockerfile
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository ppa:git-core/ppa && \
+    apt-get update && \
+    apt-get install -y git build-essential cmake && \
+    git --version
+
+RUN apt-get update && \
+apt-get install -y \
+curl \
+wget \
+bzip2 \
+ca-certificates \
+libglib2.0-0 \
+libxext6 \
+libsm6 \
+libxrender1 \
+git \
+vim \
+mercurial \
+subversion \
+cmake \
+libboost-dev \
+libboost-system-dev \
+libboost-filesystem-dev \
+gcc \
+g++
+
+# Add OpenCL ICD files for LightGBM
+RUN mkdir -p /etc/OpenCL/vendors && \
+echo "libnvidia-opencl.so.1" > /etc/OpenCL/vendors/nvidia.icd
+
+##############################################################################
+# TINI
+##############################################################################
+
+# Install tini
+ENV TINI_VERSION v0.14.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
+
+##############################################################################
+# python, poetry
+##############################################################################
+
+# https://qiita.com/shngt/items/51102aeb81834d0d3d7a
+
+ENV PYTHON_VERSION 3.7.9
+ENV HOME /root
+ENV PYTHON_ROOT $HOME/local/python-$PYTHON_VERSION
+ENV PATH $PYTHON_ROOT/bin:$PATH
+ENV PYENV_ROOT $HOME/.pyenv
+RUN apt-get update && apt-get upgrade -y \
+ && apt-get install -y \
+    git \
+    make \
+    build-essential \
+    libssl-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    wget \
+    curl \
+    llvm \
+    libncurses5-dev \
+    libncursesw5-dev \
+    xz-utils \
+    tk-dev \
+    libffi-dev \
+    liblzma-dev \
+ && git clone https://github.com/pyenv/pyenv.git $PYENV_ROOT \
+ && $PYENV_ROOT/plugins/python-build/install.sh \
+ && /usr/local/bin/python-build -v $PYTHON_VERSION $PYTHON_ROOT \
+ && rm -rf $PYENV_ROOT
+
+# RUN apt-get update && apt-get install -y python3.7 python3-pip
+# RUN ln -sf /usr/bin/python3 /usr/bin/python && ln -sf /usr/bin/pip3 /usr/bin/pip
+
+RUN apt-get update && apt-get install -y python3-pip
+ENV PIP_DISABLE_PIP_VERSION_CHECK=on
+RUN pip install poetry==1.1.4
